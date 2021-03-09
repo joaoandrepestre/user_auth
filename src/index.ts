@@ -1,12 +1,22 @@
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
 import express, { Request, Response } from 'express';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { create_user, login, logout } from './user';
 
+const private_key = fs.readFileSync('certs/selfsigned.key');
+const certificate = fs.readFileSync('certs/selfsigned.crt');
+
+const credentials = {key: private_key, cert: certificate};
+
 const app = express();
 app.use(json());
-app.use(cors());
-const port: Number = 3000;
+app.use(cors({credentials: true}));
+
+const httpPort: Number = 3000;
+const httpsPort: Number = 3030;
 
 // Create user route point
 app.post('/user/create', (req: Request, res: Response) => {
@@ -50,5 +60,12 @@ app.get('/user/logout', (req: Request, res: Response) => {
         res.send({ status: 'err', msg: 'Failed to logout...' });
 });
 
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(httpPort);
+httpsServer.listen(httpsPort, () => {
+    console.log(`Express server listening on port ${httpsPort}...`)
+});
 // Start server listening on given port
-app.listen(port, () => console.log(`Express server listening on port ${port}...`));
+//app.listen(port, () => console.log(`Express server listening on port ${port}...`));

@@ -7,7 +7,7 @@ function create_user() {
     console.log(username);
     console.log(password);
 
-    fetch('http://localhost:3000/user/create', {
+    fetch('https://localhost:3030/user/create', {
         method: 'POST',
         body: JSON.stringify({
             username: username,
@@ -38,7 +38,7 @@ function login() {
     const username = document.getElementById('username').value
     const password = document.getElementById('password').value
 
-    fetch(`http://localhost:3000/user/login?username=${username}&password=${password}`, {
+    fetch(`https://localhost:3030/user/login?username=${username}&password=${password}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ function login() {
 
 function logout() {
 
-    fetch('http://localhost:3000/user/logout', {
+    fetch('https://localhost:3030/user/logout', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
