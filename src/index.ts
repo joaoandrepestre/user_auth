@@ -12,10 +12,16 @@ const port: Number = 3000;
 app.post('/user/create', (req: Request, res: Response) => {
     const username: String = req.body.username;
     const password: String = req.body.password;
-    if (create_user(username, password))
-        res.json({ status: 'ok', username: username });
-    else
-        res.json({ status: 'err', msg: 'Failed to create user...' });
+    create_user(username, password)
+        .then(ret => {
+            if (ret)
+                res.json({ status: 'ok', username: username });
+            else
+                res.json({ status: 'err', msg: 'Failed to create user...'});
+        })
+        .catch(err => {
+            res.json({ status: 'err', msg: err });
+        });
 });
 
 
@@ -23,10 +29,16 @@ app.post('/user/create', (req: Request, res: Response) => {
 app.get('/user/login', (req: Request, res: Response) => {
     const username: String = String(req.query.username);
     const password: String = String(req.query.password);
-    if (login(username, password))
-        res.json({ status: 'ok', username: username });
-    else
-        res.json({ status: 'err', msg: 'Failed to login...' });
+    login(username, password)
+        .then(ret => {
+            if (ret)
+                res.json({ status: 'ok', username: username });
+            else
+                res.json({ status: 'err', msg: 'Username or password is incorrect' });
+        })
+        .catch(err => {
+            res.json({ status: 'err', msg: err });
+        });
 });
 
 
