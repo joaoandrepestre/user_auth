@@ -1,11 +1,10 @@
 
 
+let sid = ""
+
 function create_user() {
     const username = document.getElementById('username').value
     const password = document.getElementById('password').value
-
-    console.log(username);
-    console.log(password);
 
     fetch('http://localhost:3000/user/create', {
         method: 'POST',
@@ -38,8 +37,12 @@ function login() {
     const username = document.getElementById('username').value
     const password = document.getElementById('password').value
 
-    fetch(`http://localhost:3000/user/login?username=${username}&password=${password}`, {
-        method: 'GET',
+    fetch(`http://localhost:3000/user/login`, {
+        method: 'POST',
+        body: JSON.stringify({
+            username: username,
+            password: password
+        }),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -54,6 +57,8 @@ function login() {
 
                         user_div.hidden = false
                         user_h3.innerHTML = `User: ${json.username}`
+
+                        sid = json.sid;
 
                         form_div.hidden = true
                     } else
@@ -70,8 +75,11 @@ function login() {
 
 function logout() {
 
-    fetch('http://localhost:3000/user/logout', {
-        method: 'GET',
+    fetch(`http://localhost:3000/user/logout`, {
+        method: 'POST',
+        body: JSON.stringify({
+            sid: sid
+        }),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -79,7 +87,7 @@ function logout() {
         .then(res => {
             res.json()
                 .then(json => {
-                    if (json.status === 'ok'){
+                    if (json.status === 'ok') {
                         const user_div = document.getElementById('user-div')
                         const form_div = document.getElementById('form-div')
 
