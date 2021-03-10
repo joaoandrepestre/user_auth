@@ -2,6 +2,35 @@
 
 let sid = ""
 
+setInterval(() => {
+    if (sid !== ""){
+        fetch('http://localhost:3000/user/session', {
+            method: 'POST',
+            body: JSON.stringify({
+                sid: sid
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => {
+                res.json()
+                    .then(json => {
+                        if (json.status === 'ok')
+                            console.log(`Session is ok: ${sid}`);
+                        else
+                            console.log(`Error checking session: ${sid}`);
+                    })
+                    .catch(err => {
+                        console.log(`JSON parse error: ${err}`);
+                    })
+            })
+            .catch(err => {
+                console.log(`Network error: ${err}`);
+            })
+    }
+}, 2*1000);
+
 function create_user() {
     const username = document.getElementById('username').value
     const password = document.getElementById('password').value
@@ -13,7 +42,7 @@ function create_user() {
             password: password
         }),
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         }
     })
         .then(res => {
@@ -92,6 +121,8 @@ function logout() {
                         const form_div = document.getElementById('form-div')
 
                         user_div.hidden = true
+
+                        sid = ""
 
                         form_div.hidden = false
                     } else

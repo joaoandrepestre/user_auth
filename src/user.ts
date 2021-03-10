@@ -28,7 +28,7 @@ const generate_key = async (): Promise<String> => {
 };
 
 // Check if the given session id is on the database
-const check_session_id = async (sid: String): Promise<Boolean> => {
+export const check_session_id = async (sid: String): Promise<Boolean> => {
     const res: QueryResult = await client.query(`SELECT sid FROM "user" WHERE sid='${sid}' LIMIT 1;`);
     if (res.rowCount > 0)
         return true;

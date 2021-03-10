@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { json } from 'body-parser';
 import cors from 'cors';
-import { create_user, login, logout } from './user';
+import { create_user, login, logout, check_session_id } from './user';
 
 // Initializes express router
 const app = express();
@@ -19,7 +19,7 @@ const port: Number = 3000;
 app.post('/user/create', (req: Request, res: Response) => {
     const { username, password } = req.body;
     create_user(username, password)
-        .then(ret => {
+        .then((ret: Boolean) => {
             if (ret)
                 res.json({ status: 'ok', username: username });
             else
@@ -35,7 +35,7 @@ app.post('/user/create', (req: Request, res: Response) => {
 app.post('/user/login', (req: Request, res: Response) => {
     const { username, password } = req.body;
     login(username, password)
-        .then(ret => {
+        .then((ret: String) => {
             if (ret !== "")
                 res.json({ status: 'ok', username: username, sid: ret });
             else
@@ -46,20 +46,35 @@ app.post('/user/login', (req: Request, res: Response) => {
         });
 });
 
+// Check session id route point
+app.post('/user/session', (req: Request, res: Response) => {
+    const sid: String = req.body.sid;
+    check_session_id(sid)
+        .then((ret: Boolean) => {
+            if (ret)
+                res.json({ status: 'ok', sid: sid });
+            else
+                res.json({ status: 'err', msg: 'Session id is not valid' });
+        })
+        .catch(err => {
+            res.json({ status: 'err', msg: err });
+        });
+});
+
 
 // Logout route point
 app.post('/user/logout', (req: Request, res: Response) => {
-    const sid = req.body.sid
+    const sid: String = req.body.sid
     logout(sid)
-        .then(ret => {
+        .then((ret: Boolean) => {
             if (ret)
                 res.json({ status: 'ok' });
             else
-                res.send({ status: 'err', msg: 'Failed to logout...' });
+                res.json({ status: 'err', msg: 'Failed to logout...' });
 
         })
         .catch(err => {
-            res.send({ status: 'err', msg: err });
+            res.json({ status: 'err', msg: err });
         });
 });
 
