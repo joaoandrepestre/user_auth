@@ -18,8 +18,13 @@ const generate_key = async (): Promise<String> => {
     let key: String = "";
 
     let exists: Number = 1;
+
+    // repeat until generated key is unique
     while (exists > 0) {
+        // generate a random key
         key = crypto.randomBytes(16).toString('base64');
+
+        // check if key exists in the database
         const res: QueryResult = await client.query(`SELECT * FROM "user" WHERE sid='${key}';`);
         exists = res.rowCount;
     }
@@ -45,9 +50,12 @@ const user_exists = async (username: String): Promise<Boolean> => {
 
 // Create a new user with the given username and password, if no user with this username exists
 export const create_user = async (username: String, password: String): Promise<Boolean> => {
+
+    // check if the username already exists, returns false if it does
     if (await user_exists(username))
         return false;
 
+    // inserts new user into database, if username not already in use
     const res: QueryResult = await client.query(`INSERT INTO "user" (username, password)
                                     VALUES ('${username}', crypt('${password}', gen_salt('bf')));`);
     if (res.rowCount > 0)
@@ -57,10 +65,14 @@ export const create_user = async (username: String, password: String): Promise<B
 
 // Check if the given username and password match and generates a new session id
 export const login = async (username: String, password: String): Promise<String> => {
+
+    // checks if the username and password match
     const res: QueryResult = await client.query(`SELECT sid FROM "user" WHERE username='${username}' AND password=crypt('${password}', password) LIMIT 1;`);
 
     if (res.rowCount > 0){
+        // if it does, generate new key 
         let sid: String = await generate_key();
+        // set user's session id to the new generated key
         await client.query(`UPDATE "user" SET sid='${sid}' WHERE username='${username}';`);
         return sid;
     }
@@ -70,8 +82,10 @@ export const login = async (username: String, password: String): Promise<String>
 
 // Invalidates the session id, if it exists
 export const logout = async (sid: String): Promise<Boolean> => {
+    // checks if the session id is valid in the database
     const session: Boolean = await check_session_id(sid);
     if (session){
+        // if it is, invalidates it
         await client.query(`UPDATE "user" SET sid=NULL WHERE sid='${sid}';`);
         return true;
     }
