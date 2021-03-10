@@ -15,6 +15,8 @@ Il s'agit d'une API REST d'authentification utilisateur, exploitant certains poi
     ```
 2. Créer la base des données
     ```sh
+    sudo su - postgres
+    cd <repo dir>
     psql -f db_migrations/user_auth_db.sql
     ```
 3. Installer les packages NPM
