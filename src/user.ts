@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 
 // Define database connection
-const client = new Client({
+const client: Client = new Client({
     user: 'postgres',
     password: 'postgres',
     host: 'localhost',
@@ -29,7 +29,7 @@ const generate_key = async (): Promise<String> => {
 
 // Check if the given session id is on the database
 const check_session_id = async (sid: String): Promise<Boolean> => {
-    const res = await client.query(`SELECT sid FROM "user" WHERE sid='${sid}' LIMIT 1;`);
+    const res: QueryResult = await client.query(`SELECT sid FROM "user" WHERE sid='${sid}' LIMIT 1;`);
     if (res.rowCount > 0)
         return true;
     return false;
@@ -37,7 +37,7 @@ const check_session_id = async (sid: String): Promise<Boolean> => {
 
 // Check if the given username is on the database
 const user_exists = async (username: String): Promise<Boolean> => {
-    const res = await client.query(`SELECT sid FROM "user" WHERE username='${username}' LIMIT 1;`);
+    const res: QueryResult = await client.query(`SELECT sid FROM "user" WHERE username='${username}' LIMIT 1;`);
     if (res.rowCount > 0)
         return true;
     return false;
@@ -48,7 +48,7 @@ export const create_user = async (username: String, password: String): Promise<B
     if (await user_exists(username))
         return false;
 
-    const res = await client.query(`INSERT INTO "user" (username, password)
+    const res: QueryResult = await client.query(`INSERT INTO "user" (username, password)
                                     VALUES ('${username}', crypt('${password}', gen_salt('bf')));`);
     if (res.rowCount > 0)
         return true;
@@ -57,7 +57,7 @@ export const create_user = async (username: String, password: String): Promise<B
 
 // Check if the given username and password match and generates a new session id
 export const login = async (username: String, password: String): Promise<String> => {
-    const res = await client.query(`SELECT sid FROM "user" WHERE username='${username}' AND password=crypt('${password}', password) LIMIT 1;`);
+    const res: QueryResult = await client.query(`SELECT sid FROM "user" WHERE username='${username}' AND password=crypt('${password}', password) LIMIT 1;`);
 
     if (res.rowCount > 0){
         let sid: String = await generate_key();
